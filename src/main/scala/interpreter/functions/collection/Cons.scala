@@ -13,3 +13,15 @@ class Cons extends Function {
     })
   }
 }
+
+class Conj extends Function {
+  override val types: Seq[Class[_]] = List(Types.sequence, Types.any)
+
+  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
+    val element = Types.getAs[Identifiable](args, 1)
+    Right(Types.getAs[SequenceValue](args, 0) match {
+      case ListValue(values) => ListValue(values :+ element)
+      case VectorValue(values) => VectorValue(values :+ element)
+    })
+  }
+}

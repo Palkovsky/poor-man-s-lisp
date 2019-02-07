@@ -56,7 +56,10 @@ object ScopeManager {
 
     "func" -> new interpreter.functions.core.Def(),
     "apply" -> new interpreter.functions.core.Apply(),
+
     "cons" -> new interpreter.functions.collection.Cons(),
+    "conj" -> new interpreter.functions.collection.Conj(),
+
     "id" -> new interpreter.functions.core.Id(),
 
     "map" -> new interpreter.functions.collection.Map(),
