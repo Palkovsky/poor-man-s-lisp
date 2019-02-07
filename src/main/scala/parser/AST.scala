@@ -14,6 +14,7 @@ case class StringLiteral(value: String) extends ASTLiteral
 case class IdentifierLiteral(value: String) extends ASTLiteral
 case class VectorLiteral(elements: Seq[ASTNode]) extends ASTLiteral
 case class HashMapLiteral(map: Map[ASTLiteral, ASTNode]) extends ASTLiteral
+case class NilLiteral() extends ASTLiteral
 
 sealed trait PrefixOperator
 case class TildaOperator() extends PrefixOperator

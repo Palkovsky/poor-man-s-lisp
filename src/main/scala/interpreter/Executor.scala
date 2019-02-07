@@ -23,6 +23,7 @@ class Executor(astRoot: RootExpression) {
     case IntValue(value) => Right(IntValue(value))
     case FloatingValue(value) => Right(FloatingValue(value))
     case StringValue(value) => Right(StringValue(value))
+    case NilValue() => Right(NilValue())
 
     // Looking up an identifier
     case IdentifierValue(value) => scopeManager.get(value) match {

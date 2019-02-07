@@ -1,4 +1,4 @@
-package interpreter.functions.core
+package interpreter.functions.collection
 
 import interpreter.{ExecutionError, Executor, Function, Identifiable, ListValue, SequenceValue, Types, VectorValue}
 

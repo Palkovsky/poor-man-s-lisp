@@ -46,7 +46,7 @@ object Types {
   def vector: Class[_] = classOf[VectorValue]
   def list: Class[_] = classOf[ListValue]
   def sequence: Class[_] = classOf[SequenceValue]
-  def collection: Class[_] = classOf[MapValue]
+  def collection: Class[_] = classOf[CollectionValue]
   def map: Class[_] = classOf[MapValue]
   def function: Class[_] = classOf[Function]
   def nil: Class[_] = classOf[NilValue]

@@ -32,3 +32,7 @@ class Div extends ArithmeticOperator {
     Right(a / b)
   }
 }
+
+class Mod extends ArithmeticOperator{
+  override protected def calculate(a: Double, b: Double): Either[ExecutionError, Double] = Right(a % b)
+}

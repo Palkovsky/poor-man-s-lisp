@@ -1,8 +1,5 @@
 package interpreter
 
-import interpreter.functions.core.{Apply, Cons, Def, Id}
-import interpreter.functions.math.{Div, Minus, Mult, Plus}
-
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -45,14 +42,17 @@ class ScopeManager(base: Scope) {
 
 object ScopeManager {
   def default() = new ScopeManager(Scope(mutable.Map(
-    "+" -> new Plus(),
-    "-" -> new Minus(),
-    "*" -> new Mult(),
-    "div" -> new Div(),
-    "func" -> new Def(),
-    "apply" -> new Apply(),
-    "cons" ->  new Cons(),
-    "id" -> new Id()
+    "+" -> new interpreter.functions.math.Plus(),
+    "-" -> new interpreter.functions.math.Minus(),
+    "*" -> new interpreter.functions.math.Mult(),
+    "/" -> new interpreter.functions.math.Div(),
+    "%" -> new interpreter.functions.math.Mod(),
+
+    "func" -> new interpreter.functions.core.Def(),
+    "apply" -> new interpreter.functions.core.Apply(),
+    "cons" ->  new interpreter.functions.collection.Cons(),
+    "id" -> new interpreter.functions.core.Id(),
+    "map" -> new interpreter.functions.collection.Map()
   )))
 
   def apply(base: Scope) = new ScopeManager(base)
