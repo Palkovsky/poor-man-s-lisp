@@ -28,9 +28,9 @@ class Executor(astRoot: RootExpression) {
 
     // Looking up an identifier
     case IdentifierValue(value) => scopeManager.get(value) match {
-        case None => Left(UnknownIdentifier(value))
-        case Some(identifiable) => Right(identifiable)
-      }
+      case None => Left(UnknownIdentifier(value))
+      case Some(identifiable) => Right(identifiable)
+    }
 
     // Evaluate whole vector
     case VectorValue(values) => evalSequence(values).map(elems => VectorValue(elems))
@@ -41,10 +41,10 @@ class Executor(astRoot: RootExpression) {
 
     case MapValue(map) =>
       val result: mutable.Map[Identifiable, Identifiable] = mutable.Map()
-      for((k, v) <- map) {
+      for ((k, v) <- map) {
         eval(v) match {
           case Left(err) => return Left(err)
-          case Right(value) => result += (k->value)
+          case Right(value) => result += (k -> value)
         }
       }
       Right(MapValue(result))
@@ -54,20 +54,25 @@ class Executor(astRoot: RootExpression) {
     case ListValue(ListValue(values) +: Seq()) => eval(ListValue(values)).flatMap(res => eval(res))
     case ListValue(ListValue(values) +: tail) => eval(ListValue(values)).flatMap(result => eval(ListValue(result +: tail)))
 
+    // Function passed as first element
     case ListValue((f: Function) +: Seq()) => f.apply(List.empty, this)
-    case ListValue((f: Function) +: tail) => evalSequence(tail).flatMap(args => f.apply(args, this))
+    case ListValue((f: Function) +: tail) => f.apply(tail, this)
 
+    // Identificator passed as first element
     case ListValue(IdentifierValue(value) +: tail) => scopeManager.get(value) match {
       case Some(identifiable) =>
-        if (identifiable.isInstanceOf[Value]) Left(NotCallableError())
+        if (identifiable.isInstanceOf[Value]) Left(NotCallableError(value.toString))
         val function = identifiable.asInstanceOf[Function]
-        evalSequence(tail).flatMap(args => function.apply(args, this))
+        function.apply(tail, this)
       case None => Left(UnknownIdentifier(value))
     }
+
+    // Anything else inside list that wasn't matched
+    case ListValue(value +: _) => Left(NotCallableError(value.toString))
   }
 
   // Evaluates VectorLiteral
-  private def evalSequence(values: Seq[Identifiable]): Either[ExecutionError, Seq[Identifiable]] = {
+  def evalSequence(values: Seq[Identifiable]): Either[ExecutionError, Seq[Identifiable]] = {
     val vector = ListBuffer[Identifiable]()
     for (value <- values) {
       eval(value) match {

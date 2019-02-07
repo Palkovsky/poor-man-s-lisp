@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Map extends Function {
-  override val types: Seq[Class[_]] = List(Types.function, Types.collection)
+  override val argTypes: Seq[Class[_]] = List(Types.function, Types.collection)
 
   override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     val function = Types.getAs[Function](args, 0)

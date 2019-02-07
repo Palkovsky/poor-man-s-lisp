@@ -2,7 +2,7 @@ package interpreter.functions.math
 import interpreter.{BoolValue, ExecutionError, Executor, Function, Identifiable, NumericValue, Types}
 
 abstract class ComparisonOperator extends Function {
-  override val types: Seq[Class[_]] = List(Types.numeric, Types.numeric)
+  override val argTypes: Seq[Class[_]] = List(Types.numeric, Types.numeric)
 
   override protected def run(args: Seq[Identifiable],executor: Executor): Either[ExecutionError, Identifiable] = {
     val a = Types.getAs[NumericValue](args, 0)

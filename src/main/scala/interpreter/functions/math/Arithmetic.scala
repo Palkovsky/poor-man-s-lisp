@@ -3,7 +3,7 @@ package interpreter.functions.math
 import interpreter.{DividedByZeroError, ExecutionError, Executor, FloatingValue, Function, Identifiable, NumericValue, Types}
 
 abstract class ArithmeticOperator extends Function {
-  override val types: Seq[Class[_]] = List(Types.numeric, Types.numeric)
+  override val argTypes: Seq[Class[_]] = List(Types.numeric, Types.numeric)
 
   override protected def run(args: Seq[Identifiable],executor: Executor): Either[ExecutionError, Identifiable] = {
     val a = Types.getAs[NumericValue](args, 0)

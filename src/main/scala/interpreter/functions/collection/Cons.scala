@@ -3,7 +3,7 @@ package interpreter.functions.collection
 import interpreter.{ExecutionError, Executor, Function, Identifiable, ListValue, SequenceValue, Types, VectorValue}
 
 class Cons extends Function {
-  override val types: Seq[Class[_]] = List(Types.any, Types.sequence)
+  override val argTypes: Seq[Class[_]] = List(Types.any, Types.sequence)
 
   override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     val element = Types.getAs[Identifiable](args, 0)
@@ -15,7 +15,7 @@ class Cons extends Function {
 }
 
 class Conj extends Function {
-  override val types: Seq[Class[_]] = List(Types.sequence, Types.any)
+  override val argTypes: Seq[Class[_]] = List(Types.sequence, Types.any)
 
   override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     val element = Types.getAs[Identifiable](args, 1)

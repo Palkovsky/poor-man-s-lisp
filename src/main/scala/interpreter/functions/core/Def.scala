@@ -2,7 +2,7 @@ package interpreter.functions.core
 
 import interpreter.{ExecutionError, Executor, Function, Identifiable, IdentifierValue, ListValue, Types, VectorValue}
 
-class UserDefinedFunction(override val arity: Int, override val types: Seq[Class[_]], expr: ListValue, params: Seq[IdentifierValue]) extends Function {
+class UserDefinedFunction(override val argTypes: Seq[Class[_]], expr: ListValue, params: Seq[IdentifierValue]) extends Function {
 
   override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     for((identifier, idx) <- params.view.zipWithIndex){ //Bounding parameters with identifiers
@@ -17,7 +17,8 @@ class UserDefinedFunction(override val arity: Int, override val types: Seq[Class
 
 
 class Def extends Function {
-  override val types: Seq[Class[_]] = List(Types.identifier, Types.vector, Types.list)
+  override val argTypes: Seq[Class[_]] = List(Types.identifier, Types.vector, Types.list)
+  override def evaluatedArgs: Boolean = false
 
   override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     val name = Types.getAs[IdentifierValue](args, 0).value
@@ -26,9 +27,8 @@ class Def extends Function {
     Types.validate(params, List.fill(params.length)(Types.identifier))
       .flatMap(_ => {
         val fParamNames: Seq[IdentifierValue] = params.map(x => x.asInstanceOf[IdentifierValue])
-        val fArity: Int = params.length
-        val fTypes: Seq[Class[_]] = List.fill(fArity)(Types.identifier)
-        val function: Function = new UserDefinedFunction(fArity, fTypes, body, fParamNames)
+        val fTypes: Seq[Class[_]] = List.fill(params.length)(Types.identifier)
+        val function: Function = new UserDefinedFunction(fTypes, body, fParamNames)
         executor.scopeManager.put(name, function)
         Right(function)
       })
