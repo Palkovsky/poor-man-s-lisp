@@ -22,7 +22,7 @@ class ScopeManager(base: Scope) {
 
   def get(key: String): Option[Identifiable] = current.identifiers.get(key)
 
-  
+
   def getConcrete(key: String): Option[Identifiable] = get(key) match {
     case None => None
     case Some(IdentifierValue(value)) => getConcrete(value)
@@ -45,14 +45,23 @@ object ScopeManager {
     "+" -> new interpreter.functions.math.Plus(),
     "-" -> new interpreter.functions.math.Minus(),
     "*" -> new interpreter.functions.math.Mult(),
-    "/" -> new interpreter.functions.math.Div(),
-    "%" -> new interpreter.functions.math.Mod(),
+    "div" -> new interpreter.functions.math.Div(),
+    "mod" -> new interpreter.functions.math.Mod(),
+
+    "eq" -> new interpreter.functions.core.Eq(),
+    "gt" -> new interpreter.functions.math.Greater(),
+    "gte" -> new interpreter.functions.math.GreaterOrEqual(),
+    "lt" -> new interpreter.functions.math.Lesser(),
+    "lte" -> new interpreter.functions.math.LesserOrEqual(),
 
     "func" -> new interpreter.functions.core.Def(),
     "apply" -> new interpreter.functions.core.Apply(),
-    "cons" ->  new interpreter.functions.collection.Cons(),
+    "cons" -> new interpreter.functions.collection.Cons(),
     "id" -> new interpreter.functions.core.Id(),
-    "map" -> new interpreter.functions.collection.Map()
+
+    "map" -> new interpreter.functions.collection.Map(),
+    "filter" -> new interpreter.functions.collection.Filter(),
+    "reduce" -> new interpreter.functions.collection.Reduce()
   )))
 
   def apply(base: Scope) = new ScopeManager(base)

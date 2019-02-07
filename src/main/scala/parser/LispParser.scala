@@ -38,6 +38,8 @@ class LispParser extends RegexParsers with ParserUtils {
     between("{", "}",  rep[(ASTLiteral, ASTNode)](keyValuePair)) ^^ {pairs => HashMapLiteral(pairs.toMap)}
   }
 
+  private def bool: Parser[BoolLiteral] = ("true".r | "false".r) ^^ {value => BoolLiteral(value.equals("true"))}
+
   // Nil value
   private def nil: Parser[NilLiteral] = "nil".r ^^ {_ => NilLiteral()}
 
@@ -54,7 +56,7 @@ class LispParser extends RegexParsers with ParserUtils {
   }
 
   // Matches all literals
-  private def literal: Parser[ASTLiteral] = positioned(floating | integer | nil | identifier | string | vector | hashmap)
+  private def literal: Parser[ASTLiteral] = positioned(floating | integer | nil | bool | identifier | string | vector | hashmap)
 
   // Matches all hashable epxressions
   private def hashable: Parser[ASTLiteral] = positioned(floating | integer | string | identifier)

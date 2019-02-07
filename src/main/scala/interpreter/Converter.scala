@@ -18,6 +18,7 @@ object Converter {
     case IdentifierLiteral(value) => IdentifierValue(value)
     case VectorLiteral(value) => VectorValue(value.map(e => toIdentifiable(e)))
     case NilLiteral() => NilValue()
+    case BoolLiteral(value) => BoolValue(value)
     case PrefixedExpression(prefix, value) => PrefixedValue(prefix, toIdentifiable(value))
     case ListExpression(children) => ListValue(children.map(e => toIdentifiable(e)))
     case HashMapLiteral(map) => MapValue(map.foldLeft(mutable.Map[Identifiable, Identifiable]()) { case (acc, (k, v)) => acc += (toIdentifiable(k) -> toIdentifiable(v)) })
