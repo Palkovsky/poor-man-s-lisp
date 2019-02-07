@@ -34,27 +34,27 @@ class LispParser extends RegexParsers with ParserUtils {
 
   // Will match key/value pairs contained inside { }
   private def hashmap: Parser[HashMapLiteral] = {
-    def keyValuePair: Parser[(ASTHashable, ASTNode)] = hashable ~ expression ^^ {case key ~ value => (key, value)}
-    between("{", "}",  rep[(ASTHashable, ASTNode)](keyValuePair)) ^^ {pairs => HashMapLiteral(pairs.toMap)}
+    def keyValuePair: Parser[(ASTLiteral, ASTNode)] = hashable ~ expression ^^ {case key ~ value => (key, value)}
+    between("{", "}",  rep[(ASTLiteral, ASTNode)](keyValuePair)) ^^ {pairs => HashMapLiteral(pairs.toMap)}
   }
 
   // Allowed prefix operators
   private def prefixOperators: Parser[String] = "~" | "`" | "."
 
   // Will match any prefixed expression with allowed
-  private def prefixed: Parser[PrefixedExpression] = prefixOperators ~ expression ^^ { case pref ~ expr => {
+  private def prefixed: Parser[PrefixedExpression] = prefixOperators ~ expression ^^ { case pref ~ expr =>
     pref match {
       case "~" => PrefixedExpression(TildaOperator(), expr)
       case "`" => PrefixedExpression(BacktickOperator(), expr)
       case "." => PrefixedExpression(DotOperator(), expr)
     }
-  }}
+  }
 
   // Matches all literals
   private def literal: Parser[ASTLiteral] = positioned(floating | integer | identifier | string | vector | hashmap)
 
   // Matches all hashable epxressions
-  private def hashable: Parser[ASTHashable] = positioned(floating | integer | string)
+  private def hashable: Parser[ASTLiteral] = positioned(floating | integer | string | identifier)
 
   // Matches every type of expression
   private def expression: Parser[ASTNode] = positioned(list | literal | prefixed)

@@ -3,6 +3,7 @@ package interpreter
 
 import parser.{BacktickOperator, RootExpression}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Executor(astRoot: RootExpression) {
@@ -35,11 +36,19 @@ class Executor(astRoot: RootExpression) {
     // Backtick operator prevents evaluation
     case PrefixedValue(BacktickOperator(), value) => Right(value)
 
-    // Not implementing hashmaps forn now
-    //case HashMapLiteral(map) => Right(map)
+
+    case MapValue(map) =>
+      val result: mutable.Map[Identifiable, Identifiable] = mutable.Map()
+      for((k, v) <- map) {
+        eval(v) match {
+          case Left(err) => return Left(err)
+          case Right(value) => result += (k->value)
+        }
+      }
+      Right(MapValue(result))
 
     // Lists allow for function calling
-    case ListValue(Seq()) => Left(EmptyListError())
+    case ListValue(Seq()) => Right(ListValue(List()))
     case ListValue(ListValue(values) +: Seq()) => eval(ListValue(values)).flatMap(res => eval(res))
     case ListValue(ListValue(values) +: tail) => eval(ListValue(values)).flatMap(result => eval(ListValue(result +: tail)))
 

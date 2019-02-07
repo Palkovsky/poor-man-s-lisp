@@ -1,6 +1,6 @@
 package interpreter
 
-import interpreter.functions.core.{Apply, Cons, Def}
+import interpreter.functions.core.{Apply, Cons, Def, Id}
 import interpreter.functions.math.{Div, Minus, Mult, Plus}
 
 import scala.collection.mutable
@@ -51,7 +51,8 @@ object ScopeManager {
     "div" -> new Div(),
     "func" -> new Def(),
     "apply" -> new Apply(),
-    "cons" -> new Cons()
+    "cons" ->  new Cons(),
+    "id" -> new Id()
   )))
 
   def apply(base: Scope) = new ScopeManager(base)
