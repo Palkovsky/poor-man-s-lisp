@@ -10,8 +10,9 @@ object Main extends App {
   val code4 = "(defn even [x] (eq 0 (mod x 2))) (filter even {a 1 b 2 c 3 d 4 e 5})"
   val code5 = "(reduce conj [] `(1 2 3))"
   val code6 = "((cons - `(1 2)))"
+  val code7 = "(def x 3) ((fn [x] (eq 0 (mod x 2))) x)"
 
-  parser.parseLisp(code3) match {
+  parser.parseLisp(code7) match {
     case parser.Success(root: RootExpression, _) =>
       val executor: Executor = new Executor(root)
       println(root)

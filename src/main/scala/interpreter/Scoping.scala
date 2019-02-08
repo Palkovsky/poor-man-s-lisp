@@ -12,13 +12,12 @@ class ScopeManager(base: Scope) {
 
   def current: Scope = scopeStack.last
 
-  /*
   def enter(scope: Scope): Unit = {
-    scopeStack += current.copy(identifiers = current.identifiers.filterKeys(k => scope.identifiers.keySet.contains(k)))
+    scopeStack += Scope(current.identifiers ++ scope.identifiers)
   }
 
   def leave(): Scope = scopeStack.remove(scopeStack.size - 1)
-*/
+
 
   def get(key: String): Option[Identifiable] = current.identifiers.get(key)
 
@@ -38,6 +37,21 @@ class ScopeManager(base: Scope) {
     current.identifiers -= key
     key
   }
+}
+
+class ScopeBuilder {
+  private val identifiers: mutable.Map[String, Identifiable] = mutable.Map()
+
+  def put(key: String, value: Identifiable): ScopeBuilder = {
+    identifiers += (key -> value)
+    this
+  }
+
+  def build(): Scope = Scope(identifiers)
+}
+
+object ScopeBuilder {
+  def apply(): ScopeBuilder = new ScopeBuilder()
 }
 
 object ScopeManager {
@@ -71,3 +85,4 @@ object ScopeManager {
 
   def apply(base: Scope) = new ScopeManager(base)
 }
+
