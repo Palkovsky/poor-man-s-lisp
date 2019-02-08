@@ -54,7 +54,9 @@ object ScopeManager {
     "lt" -> new interpreter.functions.math.Lesser(),
     "lte" -> new interpreter.functions.math.LesserOrEqual(),
 
-    "func" -> new interpreter.functions.core.Def(),
+    "def" -> new interpreter.functions.core.Def(),
+    "defn" -> new interpreter.functions.core.DefFn(),
+    "fn" -> new interpreter.functions.core.Lambda(),
     "apply" -> new interpreter.functions.core.Apply(),
 
     "cons" -> new interpreter.functions.collection.Cons(),
