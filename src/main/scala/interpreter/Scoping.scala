@@ -80,7 +80,21 @@ object ScopeManager {
 
     "map" -> new interpreter.functions.collection.Map(),
     "filter" -> new interpreter.functions.collection.Filter(),
-    "reduce" -> new interpreter.functions.collection.Reduce()
+    "reduce" -> new interpreter.functions.collection.Reduce(),
+
+    "nil?" -> new interpreter.functions.core.IsNil(),
+    "str?" -> new interpreter.functions.core.IsString(),
+    "coll?" -> new interpreter.functions.core.IsCollection(),
+    "seq?" -> new interpreter.functions.core.IsSequence(),
+    "vector?" -> new interpreter.functions.core.IsVector(),
+    "list?" -> new interpreter.functions.core.IsList(),
+    "map?" -> new interpreter.functions.core.IsMap(),
+    "num?" -> new interpreter.functions.core.IsNumeric(),
+    "int?" -> new interpreter.functions.core.IsInt(),
+    "float?" -> new interpreter.functions.core.IsFloating(),
+    "func?" -> new interpreter.functions.core.IsFunction(),
+    "bool?" -> new interpreter.functions.core.IsBool(),
+    "identifier?" -> new interpreter.functions.core.IsIdentifier()
   )))
 
   def apply(base: Scope) = new ScopeManager(base)

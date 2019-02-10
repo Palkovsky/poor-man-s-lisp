@@ -11,8 +11,9 @@ object Main extends App {
   val code5 = "(reduce conj [] `(1 2 3))"
   val code6 = "((cons - `(1 2)))"
   val code7 = "(def x 3) ((fn [x] (eq 0 (mod x 2))) x)"
+  val code8 = "(num? ((fn [x] (+ x 2)) 2))"
 
-  parser.parseLisp(code7) match {
+  parser.parseLisp(code8) match {
     case parser.Success(root: RootExpression, _) =>
       val executor: Executor = new Executor(root)
       println(root)

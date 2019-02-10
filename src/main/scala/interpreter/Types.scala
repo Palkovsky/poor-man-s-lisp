@@ -73,6 +73,8 @@ object Types {
 
   def function: Class[_] = classOf[Function]
 
+  def bool: Class[_] = classOf[BoolValue]
+
   def nil: Class[_] = classOf[NilValue]
 
   def any: Class[_] = classOf[Identifiable]
