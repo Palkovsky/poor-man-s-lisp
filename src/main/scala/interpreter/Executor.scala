@@ -69,6 +69,9 @@ class Executor(astRoot: RootExpression) {
 
     // Anything else inside list that wasn't matched
     case ListValue(value +: _) => Left(NotCallableError(value.toString))
+
+    // Temporary solution to hide warnings
+    case other => Left(NotEvaluable(other.toString))
   }
 
   // Evaluates VectorLiteral

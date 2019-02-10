@@ -81,10 +81,13 @@ object Types {
 
   def getAs[A](args: Seq[Any], idx: Int): A = args(idx).asInstanceOf[A]
 
-  def validate(seq: Seq[Identifiable], types: Seq[Class[_]]): Either[ExecutionError, _] = {
-    if (seq.length != types.length) return Left(InvalidNumberOfArgumentsError(seq.length, types.length))
-    for ((arg, i) <- seq.view.zipWithIndex) {
-      if (types(i) != identifier && !types(i).isAssignableFrom(arg.getClass)) return Left(InvalidTypeError(arg.getClass.toString, types(i).toString))
+
+  def validate(seq: Seq[Identifiable], types: Seq[Class[_]], checkTypes: Boolean = true, checkArity: Boolean = true): Either[ExecutionError, _] = {
+    if (checkArity && seq.length != types.length) return Left(InvalidNumberOfArgumentsError(seq.length, types.length))
+    if (checkTypes) {
+      for ((arg, i) <- seq.view.zipWithIndex) {
+        if (types(i) != Types.identifier && !types(i).isAssignableFrom(arg.getClass)) return Left(InvalidTypeError(arg.getClass.toString, types(i).toString))
+      }
     }
     Right(0)
   }

@@ -10,3 +10,4 @@ case class InvalidNumberOfArgumentsError(passed: Int, expected: Int) extends Exe
 case class InvalidTypeError(passed: String, expected: String) extends ExecutionError
 case class NotCallableError(value: String) extends ExecutionError
 case class DividedByZeroError() extends ExecutionError
+case class NotEvaluable(msg: String) extends ExecutionError
