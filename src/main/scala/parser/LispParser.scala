@@ -7,9 +7,10 @@ trait ParserUtils extends RegexParsers {
   def between[T](start: Parser[Any], end: Parser[Any], p: Parser[T]): Parser[T] = start ~> p <~ end
 }
 
-class LispParser extends RegexParsers with ParserUtils {
+object LispParser extends RegexParsers with ParserUtils {
 
   override protected val whiteSpace: Regex = "\\s".r
+
   override def skipWhitespace: Boolean = true
 
 
@@ -34,17 +35,18 @@ class LispParser extends RegexParsers with ParserUtils {
 
   // Will match key/value pairs contained inside { }
   private def hashmap: Parser[HashMapLiteral] = {
-    def keyValuePair: Parser[(ASTLiteral, ASTNode)] = hashable ~ expression ^^ {case key ~ value => (key, value)}
-    between("{", "}",  rep[(ASTLiteral, ASTNode)](keyValuePair)) ^^ {pairs => HashMapLiteral(pairs.toMap)}
+    def keyValuePair: Parser[(ASTLiteral, ASTNode)] = hashable ~ expression ^^ { case key ~ value => (key, value) }
+
+    between("{", "}", rep[(ASTLiteral, ASTNode)](keyValuePair)) ^^ { pairs => HashMapLiteral(pairs.toMap) }
   }
 
-  private def bool: Parser[BoolLiteral] = ("true".r | "false".r) ^^ {value => BoolLiteral(value.equals("true"))}
+  private def bool: Parser[BoolLiteral] = ("true".r | "false".r) ^^ { value => BoolLiteral(value.equals("true")) }
 
   // Nil value
-  private def nil: Parser[NilLiteral] = "nil".r ^^ {_ => NilLiteral()}
+  private def nil: Parser[NilLiteral] = "nil".r ^^ { _ => NilLiteral() }
 
   // Allowed prefix operators
-  private def prefixOperators: Parser[String] = "~" | "`" | "."
+  private def prefixOperators: Parser[String] = "~" | "`" | "." | "&"
 
   // Will match any prefixed expression with allowed
   private def prefixed: Parser[PrefixedExpression] = prefixOperators ~ expression ^^ { case pref ~ expr =>
@@ -52,6 +54,7 @@ class LispParser extends RegexParsers with ParserUtils {
       case "~" => PrefixedExpression(TildaOperator(), expr)
       case "`" => PrefixedExpression(BacktickOperator(), expr)
       case "." => PrefixedExpression(DotOperator(), expr)
+      case "&" => PrefixedExpression(AmpersandOperator(), expr)
     }
   }
 
@@ -67,5 +70,5 @@ class LispParser extends RegexParsers with ParserUtils {
   // Matches lisp source code
   private def lisp: Parser[RootExpression] = rep1[ListExpression](list) ^^ { nodes => RootExpression(nodes) }
 
-  def parseLisp(code: String):ParseResult[RootExpression] = parse(lisp, code)
+  def parseCode(code: String): ParseResult[RootExpression] = parse(lisp, code)
 }

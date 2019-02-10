@@ -61,6 +61,9 @@ object ScopeManager {
     "*" -> new interpreter.functions.math.Mult(),
     "div" -> new interpreter.functions.math.Div(),
     "mod" -> new interpreter.functions.math.Mod(),
+    "and" -> new interpreter.functions.math.And(),
+    "or" -> new interpreter.functions.math.Or(),
+    "not" -> new interpreter.functions.math.Not(),
 
     "eq" -> new interpreter.functions.core.Eq(),
     "gt" -> new interpreter.functions.math.Greater(),
@@ -82,7 +85,7 @@ object ScopeManager {
     "filter" -> new interpreter.functions.collection.Filter(),
     "reduce" -> new interpreter.functions.collection.Reduce(),
 
-    "nil?" -> new interpreter.functions.core.IsNil(),
+    "nothing?" -> new interpreter.functions.core.IsNil(),
     "str?" -> new interpreter.functions.core.IsString(),
     "coll?" -> new interpreter.functions.core.IsCollection(),
     "seq?" -> new interpreter.functions.core.IsSequence(),

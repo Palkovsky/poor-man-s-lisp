@@ -21,11 +21,5 @@ sealed trait PrefixOperator
 case class TildaOperator() extends PrefixOperator
 case class BacktickOperator() extends PrefixOperator
 case class DotOperator() extends PrefixOperator
-
-/*
-  parser.ListExpression examples:
-    (is (= 4 (+ 2 2)))
-    (is (instance? Integer 256))
-    (is (.startsWith "abcde" "ab"))
- */
+case class AmpersandOperator() extends PrefixOperator
 
