@@ -1,30 +1,17 @@
 package interpreter.functions.math
-import interpreter.{BoolValue, ExecutionError, Executor, Function, Identifiable, NumericValue, Types}
 
-abstract class ComparisonOperator extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.numeric, Types.numeric)
+import interpreter.{ArgSet, BoolValue, ExecutionError, Function, Identifiable, NumericValue, TypeArg, Types}
 
-  override protected def run(args: Seq[Identifiable],executor: Executor): Either[ExecutionError, Identifiable] = {
-    val a = Types.getAs[NumericValue](args, 0)
-    val b = Types.getAs[NumericValue](args, 1)
-    calculate(a.asDouble(), b.asDouble()).flatMap(d => Right(BoolValue(d)))
-  }
+abstract class ComparisonOperator(comparator: (Double, Double) => Either[ExecutionError, Boolean]) extends Function {
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.numeric))
 
-  protected def calculate(a: Double, b: Double): Either[ExecutionError, Boolean]
+  def run(a: NumericValue, b: NumericValue): Either[ExecutionError, Identifiable] = comparator(a.asDouble(), b.asDouble()).flatMap(d => Right(BoolValue(d)))
 }
 
-class Greater extends ComparisonOperator {
-  override protected def calculate(a: Double, b: Double): Either[ExecutionError, Boolean] = Right(a > b)
-}
+class Greater extends ComparisonOperator((a, b) => Right(a > b))
 
-class GreaterOrEqual extends ComparisonOperator {
-  override protected def calculate(a: Double, b: Double): Either[ExecutionError, Boolean] = Right(a >= b)
-}
+class GreaterOrEqual extends ComparisonOperator((a, b) => Right(a >= b))
 
-class Lesser extends ComparisonOperator {
-  override protected def calculate(a: Double, b: Double): Either[ExecutionError, Boolean] = Right(a < b)
-}
+class Lesser extends ComparisonOperator((a, b) => Right(a < b))
 
-class LesserOrEqual extends ComparisonOperator {
-  override protected def calculate(a: Double, b: Double): Either[ExecutionError, Boolean] = Right(a <= b)
-}
+class LesserOrEqual extends ComparisonOperator((a, b) => Right(a <= b))

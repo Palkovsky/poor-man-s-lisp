@@ -1,9 +1,9 @@
 package interpreter.functions.core
 
-import interpreter.{ExecutionError, Executor, Function, Identifiable, Types}
+import interpreter.{ArgSet, ExecutionError, Function, Identifiable, TypeArg, Types}
 
 class Id extends Function{
-  override val argTypes: Seq[Class[_]] = List(Types.any)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.any))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = Right(Types.getAs[Identifiable](args, 0))
+  def run(arg: Identifiable): Either[ExecutionError, Identifiable] = Right(arg)
 }

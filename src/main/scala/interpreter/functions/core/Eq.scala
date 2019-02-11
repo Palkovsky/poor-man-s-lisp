@@ -1,13 +1,9 @@
 package interpreter.functions.core
 
-import interpreter.{BoolValue, ExecutionError, Executor, Function, Identifiable, Types}
+import interpreter.{ArgSet, BoolValue, ExecutionError, Function, Identifiable, TypeArg, Types}
 
 class Eq extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.any, Types.any)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.any), TypeArg(Types.any))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val a = Types.getAs[Identifiable](args, 0)
-    val b = Types.getAs[Identifiable](args, 1)
-    Right(BoolValue(a.equals(b)))
-  }
+  def run(a: Identifiable, b: Identifiable): Either[ExecutionError, Identifiable] = Right(BoolValue(a.equals(b)))
 }

@@ -1,12 +1,12 @@
 package interpreter.functions.core
 
-import interpreter.{BoolValue, ExecutionError, Executor, Function, Identifiable, Types}
+import interpreter.{ArgSet, BoolValue, ExecutionError, Function, Identifiable, TypeArg, Types}
 
 abstract class TypeCheck(val expected: Class[_]) extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.any)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.any))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val matching = expected.isAssignableFrom(Types.getAs(args, 0).getClass)
+  def run(arg: Identifiable): Either[ExecutionError, Identifiable] = {
+    val matching = expected.isAssignableFrom(arg.getClass)
     Right(BoolValue(matching))
   }
 }

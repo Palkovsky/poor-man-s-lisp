@@ -1,42 +1,34 @@
 package interpreter.functions.core
 
-import interpreter.{ExecutionError, Executor, Function, Identifiable, IdentifierValue, ListValue, PrefixedValue, ScopeBuilder, Types, VectorValue}
+import interpreter.{ArgSet, CollapsedArg, ExecutionError, Function, Identifiable, IdentifierValue, InvalidTypeError, ListValue, PrefixedValue, ScopeBuilder, TypeArg, Types, VectorValue}
 import parser.AmpersandOperator
 
 class Def extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.identifier, Types.any)
 
   override def evaluatedArgs: Boolean = false
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.identifier), TypeArg(Types.any))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val name = Types.getAs[IdentifierValue](args, 0).value
-    val storable = Types.getAs[Identifiable](args, 1)
-    executor.scopeManager.put(name, storable)
+  def run(identifier: IdentifierValue, storable: Identifiable): Either[ExecutionError, Identifiable] = {
+    val name = identifier.value
+    getExecutor.scopeManager.put(name, storable)
     Right(storable)
   }
 }
 
 class DefFn extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.identifier, Types.vector, Types.list)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.identifier), TypeArg(Types.vector), TypeArg(Types.list))
 
   override def evaluatedArgs: Boolean = false
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val name = Types.getAs[IdentifierValue](args, 0).value
-    val params = Types.getAs[VectorValue](args, 1)
-    val body = Types.getAs[ListValue](args, idx = 2)
-    new Lambda().apply(List(params, body), executor).flatMap(function => new Def().apply(List(IdentifierValue(name), function), executor))
+  def run(identifier: IdentifierValue, params: VectorValue, body: ListValue): Either[ExecutionError, Identifiable] = {
+    val name = identifier.value
+    new Lambda().apply(List(params, body), getExecutor).flatMap(function => new Def().apply(List(IdentifierValue(name), function), getExecutor))
   }
 }
 
-class UserDefinedFunction(override val argTypes: Seq[Class[_]], expr: ListValue, params: Seq[IdentifierValue], collapsedArgs: Boolean) extends Function {
+class UserDefinedFunction(override val argSets: Seq[ArgSet], expr: ListValue, params: Seq[IdentifierValue], collapsedArgs: Boolean) extends Function {
 
-  override protected def checkArity: Boolean = !collapsedArgs
-
-  override protected def checkTypes: Boolean = false
-
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-
+  override def run(args: Seq[Identifiable]): Either[ExecutionError, Identifiable] = {
     var finalArgs = args.slice(0, params.length)
     if (collapsedArgs) {
       val collapsed: VectorValue = VectorValue(args.slice(params.length - 1, args.length))
@@ -44,29 +36,23 @@ class UserDefinedFunction(override val argTypes: Seq[Class[_]], expr: ListValue,
       println(finalArgs)
     }
 
-
     val newScope = params.view.zipWithIndex.foldLeft[ScopeBuilder](ScopeBuilder()) { case (acc, (identifier, idx)) => acc.put(identifier.value, finalArgs(idx)) }.build()
-    executor.scopeManager.enter(newScope)
-    val result = executor.eval(expr)
-    executor.scopeManager.leave()
+    getExecutor.scopeManager.enter(newScope)
+    val result = getExecutor.eval(expr)
+    getExecutor.scopeManager.leave()
     result
   }
 
 }
 
 class Lambda extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.vector, Types.list)
 
   override def evaluatedArgs: Boolean = false
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    var params = Types.getAs[VectorValue](args, 0).value
-    val body = Types.getAs[ListValue](args, idx = 1)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.vector), TypeArg(Types.list))
 
-    /*
-      Collapsed args example:
-      (defn sum [&args] (reduce + 0 args)) (sum 1 2 3) ==> 6
-     */
+  def run(identifiersVector: VectorValue, body: ListValue): Either[ExecutionError, Identifiable] = {
+    var params = identifiersVector.value
     val collapsedArgs = params.last match {
       case PrefixedValue(AmpersandOperator(), IdentifierValue(value)) =>
         params = params.updated(params.length - 1, IdentifierValue(value))
@@ -74,11 +60,12 @@ class Lambda extends Function {
       case _ => false
     }
 
-    Types.validate(params, List.fill(params.length)(Types.identifier), checkArity = !collapsedArgs)
-      .flatMap(_ => {
-        val fParamNames: Seq[IdentifierValue] = params.map(x => x.asInstanceOf[IdentifierValue])
-        val fTypes: Seq[Class[_]] = List.fill(params.length)(Types.identifier)
-        Right(new UserDefinedFunction(fTypes, body, fParamNames, collapsedArgs))
-      })
+    val testingArgSet = ArgSet(List.fill(params.length)(TypeArg(Types.identifier)))
+    if(!testingArgSet.matching(params)) Left(InvalidTypeError(params.toString, testingArgSet.toString))
+
+    val fParamNames = params.map(x => x.asInstanceOf[IdentifierValue])
+    var fTypes = ArgSet(List.fill(params.length)(TypeArg(Types.any)))
+    if(collapsedArgs) fTypes = ArgSet(fTypes.types.updated(fTypes.types.length-1, CollapsedArg()))
+    Right(new UserDefinedFunction(List(fTypes), body, fParamNames, collapsedArgs))
   }
 }

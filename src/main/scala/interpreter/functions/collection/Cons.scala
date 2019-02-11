@@ -1,27 +1,21 @@
 package interpreter.functions.collection
 
-import interpreter.{ExecutionError, Executor, Function, Identifiable, ListValue, SequenceValue, Types, VectorValue}
+import interpreter.{ArgSet, ExecutionError, Function, Identifiable, ListValue, SequenceValue, TypeArg, Types, VectorValue}
 
 class Cons extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.any, Types.sequence)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.any), TypeArg(Types.sequence))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val element = Types.getAs[Identifiable](args, 0)
-    Right(Types.getAs[SequenceValue](args, 1) match {
-      case ListValue(values) => ListValue(element +: values)
-      case VectorValue(values) => VectorValue(element +: values)
-    })
+  def run(element: Identifiable, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case ListValue(values) => Right(ListValue(element +: values))
+    case VectorValue(values) => Right(VectorValue(element +: values))
   }
 }
 
 class Conj extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.sequence, Types.any)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.sequence), TypeArg(Types.any))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val element = Types.getAs[Identifiable](args, 1)
-    Right(Types.getAs[SequenceValue](args, 0) match {
-      case ListValue(values) => ListValue(values :+ element)
-      case VectorValue(values) => VectorValue(values :+ element)
-    })
+  def run(sequence: SequenceValue, element: Identifiable): Either[ExecutionError, Identifiable] = sequence match {
+    case ListValue(values) => Right(ListValue(values :+ element))
+    case VectorValue(values) => Right(VectorValue(values :+ element))
   }
 }

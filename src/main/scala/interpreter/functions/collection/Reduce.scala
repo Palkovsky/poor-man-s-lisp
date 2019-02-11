@@ -1,23 +1,21 @@
 package interpreter.functions.collection
 
-import interpreter.{CollectionValue, ExecutionError, Executor, Function, Identifiable, ListValue, Types, VectorValue}
+import interpreter.{ArgSet, ExecutionError, Function, Identifiable, ListValue, SequenceValue, TypeArg, Types, VectorValue}
 
 class Reduce extends Function {
-  override val argTypes: Seq[Class[_]] = List(Types.function, Types.any, Types.sequence)
+  override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.function), TypeArg(Types.any), TypeArg(Types.sequence))
 
-  override protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    val function = Types.getAs[Function](args, 0)
-    val acc = Types.getAs[Identifiable](args, 1)
-    Types.getAs[CollectionValue](args, 2) match {
-      case ListValue(elements) => reduceSequence(function, acc, elements, executor)
-      case VectorValue(elements) => reduceSequence(function, acc, elements, executor)
-    }
+
+  def run(function: Function, acc: Identifiable, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case ListValue(elements) => reduceSequence(function, acc, elements)
+    case VectorValue(elements) => reduceSequence(function, acc, elements)
   }
 
-  private def reduceSequence(f: Function, initAcc: Identifiable, sequence: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
+
+  private def reduceSequence(f: Function, initAcc: Identifiable, sequence: Seq[Identifiable]): Either[ExecutionError, Identifiable] = {
     var acc = initAcc
     for (elem <- sequence) {
-      f.apply(List(acc, elem), executor) match {
+      f.apply(List(acc, elem), getExecutor) match {
         case Left(err) => return Left(err)
         case Right(value) => acc = value
       }

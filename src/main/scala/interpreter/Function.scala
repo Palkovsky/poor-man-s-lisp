@@ -2,16 +2,38 @@ package interpreter
 
 
 trait Function extends Identifiable {
-  val argTypes: Seq[Class[_]]
+
+  protected val argSets: Seq[ArgSet]
+  private var executor: Executor = _
 
   protected def evaluatedArgs: Boolean = true
-  protected def checkArity: Boolean = true
-  protected def checkTypes: Boolean = true
 
-  protected def run(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable]
+  private def matchingArgSet(args: Seq[Identifiable]): Either[ExecutionError, ArgSet] = {
+    for (argSet <- argSets) {
+      if (argSet.matching(args)) return Right(argSet)
+    }
+    Left(InvalidTypeError(args.toString, argSets.toString))
+  }
+
+  protected def getExecutor: Executor = this.executor
+
+  protected def run(args: Seq[Identifiable]): Either[ExecutionError, Identifiable] = Left(NotEvaluable("Unable to locate function code."))
 
   final def apply(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
-    if(evaluatedArgs) executor.evalSequence(args).flatMap(evaluated => Types.validate(evaluated, argTypes, checkTypes, checkArity).flatMap(_ => run(evaluated, executor)))
-    else Types.validate(args, argTypes, checkTypes, checkArity).flatMap(_ => run(args, executor))
+    this.executor = executor
+
+
+    val finalArgs: Either[ExecutionError, Seq[Identifiable]] = if (evaluatedArgs) executor.evalSequence(args) else Right(args)
+    finalArgs.flatMap(evaluated => {
+      matchingArgSet(evaluated).flatMap(argSet => {
+        try {
+          val method = argSet.findMethod(getClass, "run")
+          method.invoke(this, evaluated: _*).asInstanceOf[Either[ExecutionError, Identifiable]]
+        } catch {
+          case _: NoSuchMethodException =>
+            run(evaluated)
+        }
+      })
+    })
   }
 }
