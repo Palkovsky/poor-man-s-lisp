@@ -17,7 +17,7 @@ trait Function extends Identifiable {
 
   protected def getExecutor: Executor = this.executor
 
-  protected def run(args: Seq[Identifiable]): Either[ExecutionError, Identifiable] = Left(NotEvaluable("Unable to locate function code."))
+  protected def run(args: Seq[Identifiable]): Either[ExecutionError, Identifiable] = Left(GenericError("Unable to locate function code."))
 
   final def apply(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     this.executor = executor

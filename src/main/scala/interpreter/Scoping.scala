@@ -75,6 +75,7 @@ object ScopeManager {
     "defn" -> new interpreter.functions.core.DefFn(),
     "fn" -> new interpreter.functions.core.Lambda(),
     "apply" -> new interpreter.functions.core.Apply(),
+    "if" -> new interpreter.functions.core.If(),
 
     "cons" -> new interpreter.functions.collection.Cons(),
     "conj" -> new interpreter.functions.collection.Conj(),

@@ -20,6 +20,10 @@ class CoreFunctionTests extends BaseSpec {
       exec("(defn sub [x y] (- x y)) (apply sub `(1 2))") should equal(FloatingValue(-1.0))
     }
 
+    it("Simple if") {
+      exec("(if (eq 2 (+ 1 1)) then 2 else \"xD\")") should equal(IntValue(2))
+    }
+
     it("Map function") {
       exec("(defn addTwo [x] (+ x 2)) (map addTwo {x 1 y 2 z 3})") should equal(MapValue(mutable.Map(
         IdentifierValue("x") -> IntValue(3),

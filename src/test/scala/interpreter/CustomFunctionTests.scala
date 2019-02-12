@@ -16,6 +16,10 @@ class CustomFunctionTests extends BaseSpec{
     it("Multi arg composition function"){
       exec("(defn comp [f g] (fn [&args] (f ((cons g (asList args))) ))) (defn addTwo [x] (+ x 2)) (def f (comp addTwo +)) (f 3 1)") should equal(FloatingValue(6.0))
     }
+
+    it("Recursive pow function"){
+      exec("(defn pow [x a] (if (eq a 1) then x else (* x (pow x (- a 1))))) (pow 4 3)") should equal(FloatingValue(64.0))
+    }
   }
 
 }

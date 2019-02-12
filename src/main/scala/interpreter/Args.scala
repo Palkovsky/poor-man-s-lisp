@@ -28,7 +28,12 @@ case class ArgSet(types: Seq[Arg]) {
   }
 
   def findMethod(klass: Class[_], name: String): Method = {
-    val argTypes = types.filter(arg => arg.isInstanceOf[TypeArg]).map(arg => arg.asInstanceOf[TypeArg].t)
+    val argTypes = types.map{
+      case TypeArg(t) => t
+      case EqualArg(identifiable) => identifiable.getClass
+      case CollapsedArg() => Types.any
+    }
+
     klass.getMethod(name, argTypes: _*)
   }
 }
