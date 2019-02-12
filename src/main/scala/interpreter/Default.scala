@@ -22,6 +22,7 @@ object Default {
     "def" -> new interpreter.functions.core.Def(),
     "defn" -> new interpreter.functions.core.DefFn(),
     "fn" -> new interpreter.functions.core.Lambda(),
+    "let" -> new interpreter.functions.core.Let(),
     "apply" -> new interpreter.functions.core.Apply(),
     "if" -> new interpreter.functions.core.If(),
 
