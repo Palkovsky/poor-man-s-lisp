@@ -48,7 +48,7 @@ class CoreFunctionTests extends BaseSpec {
     exec("(bool? (and false true))") should equal(BoolValue(true))
   }
 
-  it("nil? function"){
+  it("num? function"){
     exec("(num? ((fn [x] (+ x 2)) 2))") should equal(BoolValue(true))
   }
 

@@ -78,6 +78,8 @@ object ScopeManager {
 
     "cons" -> new interpreter.functions.collection.Cons(),
     "conj" -> new interpreter.functions.collection.Conj(),
+    "asList" -> new interpreter.functions.collection.ToList(),
+    "asVector" -> new interpreter.functions.collection.ToVector(),
 
     "id" -> new interpreter.functions.core.Id(),
 

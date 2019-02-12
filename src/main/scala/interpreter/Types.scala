@@ -3,8 +3,9 @@ package interpreter
 import parser.PrefixOperator
 
 import scala.collection.mutable
+import scala.util.parsing.input.Positional
 
-trait Identifiable
+trait Identifiable extends Positional
 
 trait Value extends Identifiable
 
@@ -18,7 +19,7 @@ trait NumericValue extends Value {
   def asInt(): Int
 
   override def equals(obj: Any): Boolean = {
-    if (!obj.isInstanceOf[NumericValue]) false
+    if (!obj.isInstanceOf[NumericValue]) return false
     obj.asInstanceOf[NumericValue].asDouble() == asDouble()
   }
 }

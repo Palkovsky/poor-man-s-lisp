@@ -12,7 +12,7 @@ trait Function extends Identifiable {
     for (argSet <- argSets) {
       if (argSet.matching(args)) return Right(argSet)
     }
-    Left(InvalidTypeError(args.toString, argSets.toString))
+    Left(InvalidTypeError(args, argSets))
   }
 
   protected def getExecutor: Executor = this.executor

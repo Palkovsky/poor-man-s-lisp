@@ -12,7 +12,7 @@ class BaseSpec extends FunSpec with Matchers {
     case LispParser.Error(msg, _) => fail(msg)
   }
 
-  def exec(code: String): Identifiable = new Executor(parse(code)).run() match {
+  def exec(code: String): Identifiable = new Executor().run(parse(code)) match {
     case Right(identifiable) => identifiable
     case Left(err) => fail(err.toString)
   }

@@ -1,6 +1,7 @@
 name := "my-little-lisp"
 
 version := "0.1"
+connectInput in run := true
 
 scalaVersion := "2.12.8"
 

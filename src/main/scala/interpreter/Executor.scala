@@ -6,17 +6,30 @@ import parser.{BacktickOperator, RootExpression}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class Executor(astRoot: RootExpression) {
+class Executor() {
 
   val scopeManager: ScopeManager = ScopeManager.default()
-  val program: Seq[Identifiable] = Converter.convert(astRoot)
 
 
-  // Stop execution after first error.
-  // If everything went good return from last expression.
-  def run(): Either[ExecutionError, Identifiable] = program.foldLeft[Either[ExecutionError, Identifiable]](Right(IntValue(0)))((acc, list) => {
-    if (acc.isLeft) acc else eval(list)
-  })
+  def run(astRoot: RootExpression): Either[ExecutionError, Identifiable] = {
+    // Catch any exception so it will be passed ass ExecutionError
+    try {
+      val program: Seq[Identifiable] = Converter.convert(astRoot)
+
+      // Stop execution after first error.
+      // If everything went good return from last expression.
+      program.foldLeft[Either[ExecutionError, Identifiable]](Right(IntValue(0)))((acc, list) => {
+        if (acc.isLeft) acc else evalWithPos(list)
+      })
+    } catch {
+      case e: Throwable => Left(CriticalError(e))
+    }
+  }
+
+  def evalWithPos(node: Identifiable): Either[ExecutionError, Identifiable] = eval(node) match {
+    case Left(error) => Left(error.setPos(node.pos))
+    case x => x
+  }
 
   def eval(node: Identifiable): Either[ExecutionError, Identifiable] = node match {
     // For literals just return whatever it is
@@ -42,7 +55,7 @@ class Executor(astRoot: RootExpression) {
     case MapValue(map) =>
       val result: mutable.Map[Identifiable, Identifiable] = mutable.Map()
       for ((k, v) <- map) {
-        eval(v) match {
+        evalWithPos(v) match {
           case Left(err) => return Left(err)
           case Right(value) => result += (k -> value)
         }
@@ -51,8 +64,8 @@ class Executor(astRoot: RootExpression) {
 
     // Lists allow for function calling
     case ListValue(Seq()) => Right(ListValue(List()))
-    case ListValue(ListValue(values) +: Seq()) => eval(ListValue(values)).flatMap(res => eval(res))
-    case ListValue(ListValue(values) +: tail) => eval(ListValue(values)).flatMap(result => eval(ListValue(result +: tail)))
+    case ListValue(ListValue(values) +: Seq()) => evalWithPos(ListValue(values)).flatMap(res => evalWithPos(res))
+    case ListValue(ListValue(values) +: tail) => evalWithPos(ListValue(values)).flatMap(result => evalWithPos(ListValue(result +: tail)))
 
     // Function passed as first element
     case ListValue((f: Function) +: Seq()) => f.apply(List.empty, this)
@@ -61,24 +74,27 @@ class Executor(astRoot: RootExpression) {
     // Identificator passed as first element
     case ListValue(IdentifierValue(value) +: tail) => scopeManager.get(value) match {
       case Some(identifiable) =>
-        if (identifiable.isInstanceOf[Value]) Left(NotCallableError(value.toString))
+        if (identifiable.isInstanceOf[Value]) Left(NotCallableError(IdentifierValue(value)))
         val function = identifiable.asInstanceOf[Function]
         function.apply(tail, this)
       case None => Left(UnknownIdentifier(value))
     }
 
     // Anything else inside list that wasn't matched
-    case ListValue(value +: _) => Left(NotCallableError(value.toString))
+    case ListValue(value +: _) => Left(NotCallableError(value))
+
+    // Function outside list expression is like literal
+    case function: Function => Right(function)
 
     // Temporary solution to hide warnings
-    case other => Left(NotEvaluable(other.toString))
+    case other => Left(NotEvaluable(other))
   }
 
   // Evaluates VectorLiteral
   def evalSequence(values: Seq[Identifiable]): Either[ExecutionError, Seq[Identifiable]] = {
     val vector = ListBuffer[Identifiable]()
     for (value <- values) {
-      eval(value) match {
+      evalWithPos(value) match {
         case Right(v) => vector += v
         case Left(err) => return Left(err) // maybe we should try accumulating errors?
       }
