@@ -14,6 +14,11 @@ case class EqualArg(identifiable: Identifiable) extends Arg {
   override def matching(arg: Identifiable): Boolean = identifiable.equals(arg)
 }
 
+case class AltArg(options: Seq[Arg]) extends Arg {
+  override def matching(identifiable: Identifiable): Boolean = options.foldLeft(false)((acc, arg) => acc || arg.matching(identifiable))
+}
+
+
 case class CollapsedArg() extends Arg {
   override def matching(identifiable: Identifiable): Boolean = true
 }
@@ -31,6 +36,7 @@ case class ArgSet(types: Seq[Arg]) {
     val argTypes = types.map{
       case TypeArg(t) => t
       case EqualArg(identifiable) => identifiable.getClass
+      case AltArg(_) => Types.any
       case CollapsedArg() => Types.any
     }
 

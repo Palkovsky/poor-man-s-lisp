@@ -7,7 +7,7 @@ import scala.collection.mutable
 /*
   Object responsible for translating AST into values used by executor.
  */
-object Converter {
+object ASTTranslator {
 
   def convert(root: RootExpression): Seq[Identifiable] = root.elements.map(e => toIdentifiable(e))
 

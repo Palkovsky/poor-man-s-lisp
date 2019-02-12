@@ -43,6 +43,8 @@ case class StringValue(value: String) extends Value
 case class VectorValue(value: Seq[Identifiable]) extends Value with SequenceValue
 
 case class ListValue(value: Seq[Identifiable]) extends Value with SequenceValue //unevaluated list
+
+
 case class PrefixedValue(prefix: PrefixOperator, value: Identifiable) extends Value
 
 case class MapValue(map: mutable.Map[Identifiable, Identifiable]) extends Value with CollectionValue

@@ -14,7 +14,7 @@ class Executor() {
   def run(astRoot: RootExpression): Either[ExecutionError, Identifiable] = {
     // Catch any exception so it will be passed ass ExecutionError
     try {
-      val program: Seq[Identifiable] = Converter.convert(astRoot)
+      val program: Seq[Identifiable] = ASTTranslator.convert(astRoot)
 
       // Stop execution after first error.
       // If everything went good return from last expression.

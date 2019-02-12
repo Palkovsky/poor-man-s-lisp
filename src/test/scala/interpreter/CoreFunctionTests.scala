@@ -112,6 +112,10 @@ class CoreFunctionTests extends BaseSpec {
     exec("(and (empty? (init [1])) (empty? (init `(1))))") should equal(BoolValue(true))
   }
 
+  it("take and drop functions") {
+    exec ("(concat (take 4 [1 2 3 4 5]) (drop 3 `(1 2 3 4 5)))") should equal(VectorValue(List(IntValue(1), IntValue(2), IntValue(3), IntValue(4), IntValue(4), IntValue(5))))
+  }
+
   it("empty? function on map") {
     exec("(empty? {})") should equal(BoolValue(true))
   }

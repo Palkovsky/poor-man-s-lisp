@@ -1,6 +1,6 @@
 package interpreter.functions.collection
 
-import interpreter.{ArgSet, BoolValue, CollectionValue, ExecutionError, Function, Identifiable, ListValue, MapValue, NilValue, SequenceValue, TypeArg, Types, VectorValue}
+import interpreter.{ArgSet, BoolValue, CollectionValue, ExecutionError, Function, GenericError, Identifiable, ListValue, MapValue, NilValue, NumericValue, SequenceValue, TypeArg, Types, VectorValue}
 
 
 class Cons extends Function {
@@ -54,7 +54,35 @@ class Init extends Function {
   }
 }
 
+class Take extends Function{
+  override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.sequence))
 
+  def run(numeric: NumericValue, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case ListValue(values) => Right(ListValue(values.take(numeric.asInt())))
+    case VectorValue(values) => Right(VectorValue(values.take(numeric.asInt())))
+  }
+}
+
+class Drop extends Function{
+  override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.sequence))
+
+  def run(numeric: NumericValue, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case ListValue(values) => Right(ListValue(values.drop(numeric.asInt())))
+    case VectorValue(values) => Right(VectorValue(values.drop(numeric.asInt())))
+  }
+}
+
+class Concat extends Function {
+  override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.sequence), TypeArg(Types.sequence))
+
+  def run(first: SequenceValue, second: SequenceValue): Either[ExecutionError, Identifiable] = (first, second) match {
+    case (ListValue(f), ListValue(s)) => Right(ListValue(f ++ s))
+    case (ListValue(f), VectorValue(s)) => Right(ListValue(f ++ s))
+    case (VectorValue(f), ListValue(s)) => Right(VectorValue(f ++ s))
+    case (VectorValue(f), VectorValue(s)) => Right(VectorValue(f ++ s))
+    case (_, _) => Left(GenericError("Unable to concat.")) //it won't be matched
+  }
+}
 
 class Empty extends Function {
   override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.collection))
