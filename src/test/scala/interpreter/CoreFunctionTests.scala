@@ -79,4 +79,40 @@ class CoreFunctionTests extends BaseSpec {
   it("logic operators") {
     exec("(not (or (and true true) (and true false)))") should equal(BoolValue(false))
   }
+
+  it("head function") {
+    exec("(eq (head [1 2 3]) (head `(1 2 3)))") should equal(BoolValue(true))
+  }
+
+  it("head function on empty sequence") {
+    exec("(and (nothing? (head [])) (nothing? (head `())))") should equal(BoolValue(true))
+  }
+
+  it("tail function"){
+    exec("(eq (tail [1 2 3]) (asVector (tail `(5 2 3))))") should equal(BoolValue(true))
+  }
+
+  it("tail function on empty sequence") {
+    exec("(and (nothing? (tail [])) (nothing? (tail `())))") should equal(BoolValue(true))
+  }
+
+  it("tail function on singleton") {
+    exec("(and (empty? (tail [1])) (empty? (tail `(1))))") should equal(BoolValue(true))
+  }
+
+  it("init function"){
+    exec("(eq (init [1 2 3]) (asVector (init `(1 2 5))))") should equal(BoolValue(true))
+  }
+
+  it("init function on empty sequence") {
+    exec("(and (nothing? (init [])) (nothing? (init `())))") should equal(BoolValue(true))
+  }
+
+  it("init function on singleton") {
+    exec("(and (empty? (init [1])) (empty? (init `(1))))") should equal(BoolValue(true))
+  }
+
+  it("empty? function on map") {
+    exec("(empty? {})") should equal(BoolValue(true))
+  }
 }

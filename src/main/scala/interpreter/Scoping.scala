@@ -79,6 +79,10 @@ object ScopeManager {
 
     "cons" -> new interpreter.functions.collection.Cons(),
     "conj" -> new interpreter.functions.collection.Conj(),
+    "head" -> new interpreter.functions.collection.Head(),
+    "tail" -> new interpreter.functions.collection.Tail(),
+    "init" -> new interpreter.functions.collection.Init(),
+    "empty?" -> new interpreter.functions.collection.Empty(),
     "asList" -> new interpreter.functions.collection.ToList(),
     "asVector" -> new interpreter.functions.collection.ToVector(),
 
