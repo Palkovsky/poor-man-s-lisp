@@ -13,8 +13,8 @@ object ASTTranslator {
 
   def toIdentifiable(node: ASTNode): Identifiable = {
     val converted = node match {
-      case IntegerLiteral(value) => IntValue(value)
-      case FloatingLiteral(value) => FloatingValue(value)
+      case IntegerLiteral(value) => NumericValue(value.toDouble)
+      case FloatingLiteral(value) => NumericValue(value)
       case StringLiteral(value) => StringValue(value)
       case IdentifierLiteral(value) => IdentifierValue(value)
       case VectorLiteral(value) => VectorValue(value.map(e => toIdentifiable(e)))

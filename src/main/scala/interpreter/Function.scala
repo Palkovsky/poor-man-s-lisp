@@ -22,7 +22,6 @@ trait Function extends Identifiable {
   final def apply(args: Seq[Identifiable], executor: Executor): Either[ExecutionError, Identifiable] = {
     this.executor = executor
 
-
     val finalArgs: Either[ExecutionError, Seq[Identifiable]] = if (evaluatedArgs) executor.evalSequence(args) else Right(args)
     finalArgs.flatMap(evaluated => {
       matchingArgSet(evaluated).flatMap(argSet => {

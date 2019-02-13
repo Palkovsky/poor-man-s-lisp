@@ -1,11 +1,11 @@
 package interpreter.functions.math
 
-import interpreter.{ArgSet, ExecutionError, FloatingValue, Function, Identifiable, NumericValue, TypeArg, Types}
+import interpreter.{ArgSet, ExecutionError, Function, Identifiable, NumericValue, TypeArg, Types}
 
 abstract class ArithmeticOperator(operator: (Double, Double) => Either[ExecutionError, Double]) extends Function {
   override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.numeric))
 
-  def run(a: NumericValue, b: NumericValue): Either[ExecutionError, Identifiable] = operator(a.asDouble(), b.asDouble()).flatMap(d => Right(FloatingValue(d)))
+  def run(a: NumericValue, b: NumericValue): Either[ExecutionError, Identifiable] = operator(a.value, b.value).flatMap(d => Right(NumericValue(d)))
 
 }
 

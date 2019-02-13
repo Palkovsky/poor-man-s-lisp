@@ -54,19 +54,36 @@ class Init extends Function {
   }
 }
 
-class Take extends Function{
+class Take extends Function {
   override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.sequence))
 
   def run(numeric: NumericValue, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case lazyGenerator: LazyGenerator =>
+      var taken: Seq[Identifiable] = Seq()
+      for (_ <- 1 to numeric.asInt()) {
+        lazyGenerator.next() match {
+          case Left(err) => return Left(err)
+          case Right(identifiable) => taken = taken :+ identifiable
+        }
+      }
+      Right(lazyGenerator.sequence().wrap(taken))
     case ListValue(values) => Right(ListValue(values.take(numeric.asInt())))
     case VectorValue(values) => Right(VectorValue(values.take(numeric.asInt())))
   }
 }
 
-class Drop extends Function{
+class Drop extends Function {
   override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.numeric), TypeArg(Types.sequence))
 
   def run(numeric: NumericValue, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
+    case lazyGenerator: LazyGenerator =>
+      for (_ <- 1 to numeric.asInt()) {
+        lazyGenerator.next() match {
+          case Left(err) => return Left(err)
+          case _ =>
+        }
+      }
+      Right(lazyGenerator)
     case ListValue(values) => Right(ListValue(values.drop(numeric.asInt())))
     case VectorValue(values) => Right(VectorValue(values.drop(numeric.asInt())))
   }
@@ -88,8 +105,7 @@ class Empty extends Function {
   override protected val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.collection))
 
   def run(collection: CollectionValue): Either[ExecutionError, Identifiable] = Right(BoolValue(collection match {
-    case ListValue(Seq()) => true
-    case VectorValue(Seq()) => true
+    case seq: SequenceValue => seq.values.isEmpty
     case MapValue(map) => map.isEmpty
     case _ => false
   }))
@@ -98,17 +114,11 @@ class Empty extends Function {
 class ToList extends Function {
   override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.sequence))
 
-  def run(sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
-    case ListValue(values) => Right(ListValue(values))
-    case VectorValue(values) => Right(ListValue(values))
-  }
+  def run(sequence: SequenceValue): Either[ExecutionError, Identifiable] = Right(ListValue(sequence.values))
 }
 
 class ToVector extends Function {
   override val argSets: Seq[ArgSet] = ArgSet.single(TypeArg(Types.sequence))
 
-  def run(sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
-    case ListValue(values) => Right(VectorValue(values))
-    case VectorValue(values) => Right(VectorValue(values))
-  }
+  def run(sequence: SequenceValue): Either[ExecutionError, Identifiable] = Right(VectorValue(sequence.values))
 }

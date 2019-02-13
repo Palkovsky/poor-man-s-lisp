@@ -18,7 +18,7 @@ class Executor() {
 
       // Stop execution after first error.
       // If everything went good return from last expression.
-      program.foldLeft[Either[ExecutionError, Identifiable]](Right(IntValue(0)))((acc, list) => {
+      program.foldLeft[Either[ExecutionError, Identifiable]](Right(NumericValue(0)))((acc, list) => {
         if (acc.isLeft) acc else evalWithPos(list)
       })
     } catch {
@@ -33,8 +33,7 @@ class Executor() {
 
   def eval(node: Identifiable): Either[ExecutionError, Identifiable] = node match {
     // For literals just return whatever it is
-    case IntValue(value) => Right(IntValue(value))
-    case FloatingValue(value) => Right(FloatingValue(value))
+    case NumericValue(value) => Right(NumericValue(value))
     case StringValue(value) => Right(StringValue(value))
     case NilValue() => Right(NilValue())
     case BoolValue(value) => Right(BoolValue(value))

@@ -9,7 +9,7 @@ class CoreFunctionTests extends BaseSpec {
   describe("Interpreter (core functions)") {
 
     it("Cons function") {
-      exec("((cons - `(1 2)))") should equal(FloatingValue(-1.0))
+      exec("((cons - `(1 2)))") should equal(NumericValue(-1.0))
     }
 
     it("Fn lambda function") {
@@ -17,30 +17,30 @@ class CoreFunctionTests extends BaseSpec {
     }
 
     it("Apply function") {
-      exec("(defn sub [x y] (- x y)) (apply sub `(1 2))") should equal(FloatingValue(-1.0))
+      exec("(defn sub [x y] (- x y)) (apply sub `(1 2))") should equal(NumericValue(-1.0))
     }
 
     it("Simple if") {
-      exec("(if (eq 2 (+ 1 1)) then 2 else \"xD\")") should equal(IntValue(2))
+      exec("(if (eq 2 (+ 1 1)) then 2 else \"xD\")") should equal(NumericValue(2))
     }
 
     it("Map function") {
       exec("(defn addTwo [x] (+ x 2)) (map addTwo {x 1 y 2 z 3})") should equal(MapValue(mutable.Map(
-        IdentifierValue("x") -> IntValue(3),
-        IdentifierValue("y") -> IntValue(4),
-        IdentifierValue("z") -> IntValue(5))
+        IdentifierValue("x") -> NumericValue(3),
+        IdentifierValue("y") -> NumericValue(4),
+        IdentifierValue("z") -> NumericValue(5))
       ))
     }
 
     it("Filter function") {
       exec("(defn even [x] (eq 0 (mod x 2))) (filter even {a 1 b 2 c 3 d 4 e 5})") should equal(MapValue(mutable.Map(
-        IdentifierValue("b") -> IntValue(2),
-        IdentifierValue("d") -> IntValue(4)
+        IdentifierValue("b") -> NumericValue(2),
+        IdentifierValue("d") -> NumericValue(4)
       )))
     }
 
     it("Reduce function") {
-      exec("(def x 2)(def x 3) (reduce + 0 `((- 2 1) x (+ 2 1)))") should equal(IntValue(7))
+      exec("(def x 2)(def x 3) (reduce + 0 `((- 2 1) x (+ 2 1)))") should equal(NumericValue(7))
     }
   }
 
@@ -113,7 +113,8 @@ class CoreFunctionTests extends BaseSpec {
   }
 
   it("take and drop functions") {
-    exec ("(concat (take 4 [1 2 3 4 5]) (drop 3 `(1 2 3 4 5)))") should equal(VectorValue(List(IntValue(1), IntValue(2), IntValue(3), IntValue(4), IntValue(4), IntValue(5))))
+    exec ("(concat (take 4 [1 2 3 4 5]) (drop 3 `(1 2 3 4 5)))") should
+      equal(VectorValue(List(NumericValue(1), NumericValue(2), NumericValue(3), NumericValue(4), NumericValue(4), NumericValue(5))))
   }
 
   it("empty? function on map") {

@@ -69,8 +69,8 @@ class Lambda extends Function {
 
   def run(identifiersVector: VectorValue, body: ListValue): Either[ExecutionError, Identifiable] = {
     var params = identifiersVector.value
-    val collapsedArgs = params.last match {
-      case PrefixedValue(AmpersandOperator(), IdentifierValue(value)) =>
+    val collapsedArgs = params.lastOption match {
+      case Some(PrefixedValue(AmpersandOperator(), IdentifierValue(value))) =>
         params = params.updated(params.length - 1, IdentifierValue(value))
         true
       case _ => false

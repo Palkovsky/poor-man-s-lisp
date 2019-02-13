@@ -34,6 +34,7 @@ object Default {
     "init" -> new interpreter.functions.collection.Init(),
     "take" -> new interpreter.functions.collection.Take(),
     "drop" -> new interpreter.functions.collection.Drop(),
+    "lazy-seq" -> new interpreter.functions.collection.LazySeq(),
     "empty?" -> new interpreter.functions.collection.Empty(),
     "asList" -> new interpreter.functions.collection.ToList(),
     "asVector" -> new interpreter.functions.collection.ToVector(),
@@ -52,8 +53,6 @@ object Default {
     "list?" -> new interpreter.functions.core.IsList(),
     "map?" -> new interpreter.functions.core.IsMap(),
     "num?" -> new interpreter.functions.core.IsNumeric(),
-    "int?" -> new interpreter.functions.core.IsInt(),
-    "float?" -> new interpreter.functions.core.IsFloating(),
     "func?" -> new interpreter.functions.core.IsFunction(),
     "bool?" -> new interpreter.functions.core.IsBool(),
     "identifier?" -> new interpreter.functions.core.IsIdentifier()

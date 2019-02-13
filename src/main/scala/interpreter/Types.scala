@@ -11,39 +11,43 @@ trait Value extends Identifiable
 
 trait CollectionValue extends Value
 
-trait SequenceValue extends CollectionValue
+trait SequenceValue extends CollectionValue {
+  def values: Seq[Identifiable]
 
-trait NumericValue extends Value {
-  def asDouble(): Double
+  def append(x: Identifiable): SequenceValue
 
-  def asInt(): Int
+  def concat(arr: SequenceValue): SequenceValue
 
-  override def equals(obj: Any): Boolean = {
-    if (!obj.isInstanceOf[NumericValue]) return false
-    obj.asInstanceOf[NumericValue].asDouble() == asDouble()
-  }
+  def wrap(arr: Seq[Identifiable]): SequenceValue
 }
 
-case class FloatingValue(value: Double) extends NumericValue {
-  override def asDouble(): Double = value
-
-  override def asInt(): Int = value.toInt
-}
-
-case class IntValue(value: Int) extends NumericValue {
-  override def asDouble(): Double = value.toDouble
-
-  override def asInt(): Int = value
+case class NumericValue(value: Double) extends Value {
+  def asInt(): Int = value.toInt
 }
 
 case class IdentifierValue(value: String) extends Value
 
 case class StringValue(value: String) extends Value
 
-case class VectorValue(value: Seq[Identifiable]) extends Value with SequenceValue
+case class VectorValue(value: Seq[Identifiable]) extends Value with SequenceValue {
+  override def values: Seq[Identifiable] = value
 
-case class ListValue(value: Seq[Identifiable]) extends Value with SequenceValue //unevaluated list
+  override def append(x: Identifiable): SequenceValue = VectorValue(values :+ x)
 
+  override def concat(arr: SequenceValue): SequenceValue = VectorValue(values ++ arr.values)
+
+  override def wrap(arr: Seq[Identifiable]): SequenceValue = VectorValue(arr)
+}
+
+case class ListValue(value: Seq[Identifiable]) extends Value with SequenceValue {
+  override def values: Seq[Identifiable] = value
+
+  override def append(x: Identifiable): SequenceValue = ListValue(values :+ x)
+
+  override def concat(arr: SequenceValue): SequenceValue = ListValue(values ++ arr.values)
+
+  override def wrap(arr: Seq[Identifiable]): SequenceValue = ListValue(arr)
+} //unevaluated list
 
 case class PrefixedValue(prefix: PrefixOperator, value: Identifiable) extends Value
 
@@ -54,10 +58,6 @@ case class NilValue() extends Value
 case class BoolValue(value: Boolean) extends Value
 
 object Types {
-  def int: Class[_] = classOf[IntValue]
-
-  def floating: Class[_] = classOf[FloatingValue]
-
   def numeric: Class[_] = classOf[NumericValue]
 
   def string: Class[_] = classOf[StringValue]

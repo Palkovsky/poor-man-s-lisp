@@ -19,6 +19,7 @@ class Let extends Function {
     if (!testingArgSet.matching(keyList)) Left(GenericError("Expecting identifiers as let bindings key."))
 
     val evaluatedBindings = mutable.Map[String, Identifiable]()
+
     for ((key, value) <- bindings.map) {
       getExecutor.evalWithPos(value) match {
         case Left(err) => return Left(err)
