@@ -13,67 +13,107 @@ Minimalistic LISP dialect implemented in Scala.
         * vectors `[a b c]`
 * nil `nil`
 * prefix-operators
-    * backtick `` ` `` - prevents calling by list
-    * ampersand `&` - for varargs passing
+    * backtick `` ` `` - prevents evaluation
+    * ampersand `&` - for passing varargs
     * tilda `~` - unimplemented
     * dot `.` - unimplemented
 
 ## Features
 
 * #### basic arithmetic 
-    `+, -, *, div, mod`
+    ```
+    +, -, *, div, mod
+    ```
 * #### comparators 
-    `eq, lt, lte, gt, gte`
+    ```clojure
+    eq, lt, lte, gt, gte
+    ```
 * #### logic 
-    `and, or, not`
+    ```clojure
+    and, or, not
+    ```
 * #### type-check predicates
-    `nothing?, str?, coll?, seq?, map?, vector?, list?, num?, func?, bool?, identifier?`
+    ```clojure
+    nothing?, str?, coll?, seq?, map?, vector?, list?, num?, func?, bool?, identifier?
+    ```
 * #### sequence manipulators
-    * `head seq, tail seq, init seq`
-    * `take n seq, drop n seq`
-    * `conj seq x, cons x seq`
+    * ```clojure
+      head seq, tail seq, init seq
+      ```
+    * ```clojure
+      take n seq, drop n seq
+      ```
+    * ```clojure
+      conj seq x, cons x seq
+      ```
 * #### if statement
-    `(if (eq 2 1) then "2 equals 1" else "1 equals 1") ==> "1 equals 1"`
+    ```clojure
+    (if (eq 2 1) then "2 equals 1" else "1 equals 1") ==> "1 equals 1"
+    ```
 * #### standard higher order functions
-    * `(map f coll)`
-    * `(filter f coll)`
-    * `(reduce f base coll)`
+    * ```clojure
+      (map f coll)
+      ```
+    * ```clojure
+      (filter f coll)
+      ```
+    * ```clojure
+      (reduce f base coll)
+      ```
 * #### lambdas 
-    * `(fn [x y] (+ x y))`
+    * ```clojure
+      (fn [x y] (+ x y))
+      ```
 * #### definitions
-    * `(def x 3)`
-    * `(def x "wololo")`
-    * `(def func (fn [x y] (+ x y)))`, shorter: `(defn func [x y] (+ x y))`
+    * ```clojure
+      (def x 3)
+      ```
+    * ```clojure
+      (def x "wololo")
+      ```
+    * ```clojure
+      (def func (fn [x y] (+ x y)))
+      ```
+        or shorter:
+      ```clojure
+      (defn func [x y] (+ x y))
+      ```
 * #### let statements
     * ```clojure
-        (let {foo 21 bar 37} (+ foo bar)) ==> 58
-       ```
+      (let {foo 21 bar 37} (+ foo bar)) ==> 58
+      ```
     * ```clojure
-        (defn fact [x] (let 
-            {f (fn [acc x] 
-                (if (eq x 1) then acc else (f (* acc x) (- x 1))))} 
-        (f 1 x)))
-        (fact 5) ==> 120
+      (defn fact [x] (let 
+          {f (fn [acc x] 
+              (if (eq x 1) then acc else (f (* acc x) (- x 1))))} 
+      (f 1 x)))
+      (fact 5) ==> 120
       ```
 * #### varargs
     ```clojure
-        (defn sum [&nums] (reduce + 0 nums)) (sum 1 2 3)  ==> 6
+    (defn sum [&nums] (reduce + 0 nums)) (sum 1 2 3)  ==> 6
     ```
 * #### lazy sequences
-    * Fibonacci number generator: 
+    * ##### Fibonacci number generator: 
         ```clojure
         (defn fib [] (let {f (fn [a b] (lazy-seq (cons b (f b (+ a b)))))} (f 0 1) ))
         (take 3 (drop 2 (fib))) ==> [2, 3 ,5]
         ```
-    * Multiples generator
+    * ##### Multiples generator
         ```clojure
-            (defn mults [num] 
-                (let {f (fn [i] (* i num)) 
-                      g (fn [i] (lazy-seq (cons (f i) (g (+ i 1)))))}  
-                (g 1)))
-            (take 5 (mults 5)) ==> [5, 10, 15, 20, 25]
+        (defn mults [num] 
+            (let {f (fn [i] (* i num)) 
+                  g (fn [i] (lazy-seq (cons (f i) (g (+ i 1)))))}  
+            (g 1)))
+        (take 5 (mults 5)) ==> [5, 10, 15, 20, 25]
         ```
 
+## What it does not have
+* negative numbers parsing, to make one: `(- 0 num)` 
+* maps manipulation functions
+* some kind of better conditions handling, like `cond` from Clojure
+* macros definitions
+* and probably lots of other stuff, too
     
 ## Code examples
 

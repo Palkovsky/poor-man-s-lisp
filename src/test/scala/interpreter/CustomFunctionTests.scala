@@ -32,8 +32,8 @@ class CustomFunctionTests extends BaseSpec{
     }
 
     it("Multiples generator") {
-      exec("(defn mults [num] (let {f (fn [i] (* i num)) g (fn [i] (lazy-seq (cons (f i) (g (+ i 1)))))}  (g 1))) (take 5 (mults 5))") should
-        equal(VectorValue(List(NumericValue(5), NumericValue(10), NumericValue(15), NumericValue(20), NumericValue(25))))
+      exec("(defn mults [num] (let {f (fn [i] (* i num)) g (fn [i] (lazy-seq (cons (f i) (g (+ i 1)))))}  (g 1))) (take 5 (mults (- 0 5)))") should
+        equal(VectorValue(List(NumericValue(-5), NumericValue(-10), NumericValue(-15), NumericValue(-20), NumericValue(-25))))
     }
   }
 
