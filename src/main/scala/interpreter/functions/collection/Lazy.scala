@@ -17,7 +17,7 @@ case class LazyGenerator(_sequence: SequenceValue, _generator: Identifiable, _ex
       case Right(g) => baseScope = baseScope.join(g.getContext)
       case _ => ;
     }
-
+    println(generated)
     val res = generated match {
       case Right(ListValue(IdentifierValue("cons") +: (element: Identifiable) +: Seq(nextGenerator: Identifiable))) =>
         _executor.evalWithPos(element).map(evaluated => {
@@ -26,12 +26,20 @@ case class LazyGenerator(_sequence: SequenceValue, _generator: Identifiable, _ex
           evaluated
         })
 
-      case Right(generator: LazyGenerator) =>
-        generator.next().map(identifiable => {
-          currentSequence = currentSequence.append(identifiable)
-          currentGenerator = generator.generator()
-          identifiable
-        })
+      case Right(generator: LazyGenerator) => generator.next().map(identifiable => {
+        currentSequence = currentSequence.append(identifiable)
+        currentGenerator = generator.generator()
+        identifiable
+      })
+
+
+      case Right(sequence: SequenceValue) => sequence.values.headOption match {
+        case Some(head) =>
+          currentSequence = currentSequence.append(head)
+          currentGenerator = sequence.wrap(sequence.values.tail)
+          Right(head)
+        case None => Left(GenericError("Unable to yield next item."))
+      }
 
       case other =>
         println(other)

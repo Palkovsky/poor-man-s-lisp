@@ -1,6 +1,6 @@
 package interpreter.functions.collection
 
-import interpreter.{ArgSet, BoolValue, CollectionValue, ExecutionError, Function, GenericError, Identifiable, ListValue, MapValue, NilValue, NumericValue, SequenceValue, TypeArg, Types, VectorValue}
+import interpreter.{ArgSet, BoolValue, CollectionValue, ExecutionError, Executor, Function, GenericError, Identifiable, ListValue, MapValue, NilValue, NumericValue, SequenceValue, TypeArg, Types, VectorValue}
 
 
 class Cons extends Function {
@@ -9,6 +9,7 @@ class Cons extends Function {
   def run(element: Identifiable, sequence: SequenceValue): Either[ExecutionError, Identifiable] = sequence match {
     case ListValue(values) => Right(ListValue(element +: values))
     case VectorValue(values) => Right(VectorValue(element +: values))
+    case LazyGenerator(seq: SequenceValue, generator: Identifiable, executor: Executor) => Right(LazyGenerator(seq.wrap(element +: seq.values), generator, executor))
   }
 }
 

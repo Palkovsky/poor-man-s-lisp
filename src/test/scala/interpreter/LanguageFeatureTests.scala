@@ -44,6 +44,12 @@ class LanguageFeatureTests extends BaseSpec {
       exec("(defn fib [] (let {f (fn [a b] (lazy-seq (cons b (f b (+ a b)))))} (f 0 1) )) (take 3 (drop 2 (fib)))") should
         equal(VectorValue(List(NumericValue(2.0), NumericValue(3.0), NumericValue(5.0))))
     }
+
+    it("Lazy sequences v2") {
+      exec("(defn fib [a b] (lazy-seq (cons b (fib b (+ a b))))) (take 3 (drop 2 (fib 0 1)))") should
+        equal(VectorValue(List(NumericValue(2.0), NumericValue(3.0), NumericValue(5.0))))
+    }
+
   }
 
 }

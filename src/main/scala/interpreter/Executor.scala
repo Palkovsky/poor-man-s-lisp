@@ -13,7 +13,7 @@ class Executor() {
 
   def run(astRoot: RootExpression): Either[ExecutionError, Identifiable] = {
     // Catch any exception so it will be passed ass ExecutionError
-    try {
+    //try {
       val program: Seq[Identifiable] = ASTTranslator.convert(astRoot)
 
       // Stop execution after first error.
@@ -21,9 +21,9 @@ class Executor() {
       program.foldLeft[Either[ExecutionError, Identifiable]](Right(NumericValue(0)))((acc, list) => {
         if (acc.isLeft) acc else evalWithPos(list)
       })
-    } catch {
-      case e: Throwable => Left(CriticalError(e))
-    }
+    //} catch {
+    //  case e: Throwable => Left(CriticalError(e))
+    //}
   }
 
   def evalWithPos(node: Identifiable): Either[ExecutionError, Identifiable] = eval(node) match {
