@@ -113,7 +113,7 @@ Minimalistic LISP dialect implemented in Scala.
 * maps manipulation functions
 * some kind of better conditions handling, like `cond` from Clojure
 * macros definitions
-* and probably lots of other stuff, too
+* and lots of other stuff, too
     
 ## Code examples
 
