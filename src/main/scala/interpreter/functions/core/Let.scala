@@ -1,6 +1,6 @@
 package interpreter.functions.core
 
-import interpreter.{ArgSet, ExecutionError, Function, GenericError, Identifiable, IdentifierValue, MapValue, TypeArg, Types}
+import interpreter.{ArgSet, ExecutionError, Function, GenericError, Identifiable, IdentifierValue, MapValue, Scope, TypeArg, Types}
 
 import scala.collection.mutable
 
@@ -19,7 +19,6 @@ class Let extends Function {
     if (!testingArgSet.matching(keyList)) Left(GenericError("Expecting identifiers as let bindings key."))
 
     val evaluatedBindings = mutable.Map[String, Identifiable]()
-
     for ((key, value) <- bindings.map) {
       getExecutor.evalWithPos(value) match {
         case Left(err) => return Left(err)
@@ -27,7 +26,8 @@ class Let extends Function {
       }
     }
 
-    val newScope = interpreter.Scope(evaluatedBindings)
+    val newScope = getContext.join(Scope(evaluatedBindings))
+    evaluatedBindings.values.foreach(identifiable => identifiable.setContext(newScope))
     getExecutor.scopeManager.enter(newScope)
     val result = getExecutor.evalWithPos(exprs)
     getExecutor.scopeManager.leave()

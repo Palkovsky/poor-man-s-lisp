@@ -50,6 +50,9 @@ class Executor() {
     // Backtick operator prevents evaluation
     case PrefixedValue(BacktickOperator(), value) => Right(value)
 
+      // Other operators are not implemented
+    case PrefixedValue(_, value) => evalWithPos(value)
+
 
     case MapValue(map) =>
       val result: mutable.Map[Identifiable, Identifiable] = mutable.Map()

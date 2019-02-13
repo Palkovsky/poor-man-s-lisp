@@ -4,7 +4,9 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 // ADT representing state in scope
-case class Scope(identifiers: mutable.Map[String, Identifiable])
+case class Scope(identifiers: mutable.Map[String, Identifiable]) {
+  def join(scope: Scope): Scope = Scope(identifiers ++ scope.identifiers)
+}
 
 class ScopeManager(base: Scope) {
   val scopeStack: ListBuffer[Scope] = new ListBuffer[Scope]

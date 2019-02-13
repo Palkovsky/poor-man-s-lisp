@@ -5,7 +5,16 @@ import parser.PrefixOperator
 import scala.collection.mutable
 import scala.util.parsing.input.Positional
 
-trait Identifiable extends Positional
+trait Identifiable extends Positional {
+  private var context: Scope = Scope(mutable.Map())
+
+  def setContext(context: Scope): Identifiable = {
+    this.context = context
+    this
+  }
+
+  def getContext: Scope = context
+}
 
 trait Value extends Identifiable
 
@@ -19,6 +28,11 @@ trait SequenceValue extends CollectionValue {
   def concat(arr: SequenceValue): SequenceValue
 
   def wrap(arr: Seq[Identifiable]): SequenceValue
+
+  override def setContext(context: Scope): Identifiable = {
+    values.foreach(identifiable => identifiable.setContext(context))
+    super.setContext(context)
+  }
 }
 
 case class NumericValue(value: Double) extends Value {

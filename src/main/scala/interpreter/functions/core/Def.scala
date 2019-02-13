@@ -1,9 +1,7 @@
 package interpreter.functions.core
 
-import interpreter.{ArgSet, CollapsedArg, ExecutionError, Function, GenericError, Identifiable, IdentifierValue, ListValue, MapValue, PrefixedValue, ScopeBuilder, TypeArg, Types, VectorValue}
+import interpreter.{ArgSet, CollapsedArg, ExecutionError, Function, GenericError, Identifiable, IdentifierValue, ListValue, PrefixedValue, ScopeBuilder, TypeArg, Types, VectorValue}
 import parser.{AmpersandOperator, BacktickOperator}
-
-import scala.collection.mutable
 
 class Def extends Function {
 
@@ -40,24 +38,12 @@ class UserDefinedFunction(override val argSets: Seq[ArgSet], expr: ListValue, pa
       finalArgs = finalArgs.updated(finalArgs.length - 1, collapsed)
     }
 
-    val newScope = params.view.zipWithIndex.foldLeft[ScopeBuilder](ScopeBuilder()) { case (acc, (identifier, idx)) => acc.put(identifier.value, finalArgs(idx)) }.build()
+    val paramsBindings = params.view.zipWithIndex.foldLeft[ScopeBuilder](ScopeBuilder()) { case (acc, (identifier, idx)) => acc.put(identifier.value, finalArgs(idx)) }.build()
+    val newScope = getContext.join(paramsBindings)
     getExecutor.scopeManager.enter(newScope)
-    val result = getExecutor.evalWithPos(ListValue(overrideIdentifiers(expr.value, params)))
+    val result = getExecutor.evalWithPos(expr)
     getExecutor.scopeManager.leave()
-    result
-  }
-
-  private def overrideIdentifiers(sequence: Seq[Identifiable], params: Seq[IdentifierValue]): Seq[Identifiable] = sequence.map {
-    case IdentifierValue(value) =>
-      if (!params.contains(IdentifierValue(value))) IdentifierValue(value)
-      else getExecutor.scopeManager.get(value) match {
-        case Some(identifiable) => identifiable
-        case None => IdentifierValue(value)
-      }
-    case ListValue(seq) => ListValue(overrideIdentifiers(seq, params))
-    case VectorValue(seq) => VectorValue(overrideIdentifiers(seq, params))
-    case MapValue(map) => MapValue(mutable.Map(overrideIdentifiers(map.keys.toList, params).zip(overrideIdentifiers(map.values.toList, params)):_*))
-    case other => other
+    result.map(identifiable => identifiable.setContext(newScope))
   }
 }
 

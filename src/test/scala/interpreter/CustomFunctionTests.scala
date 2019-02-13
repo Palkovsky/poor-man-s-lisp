@@ -20,6 +20,17 @@ class CustomFunctionTests extends BaseSpec{
     it("Recursive pow function"){
       exec("(defn pow [x a] (if (eq a 1) then x else (* x (pow x (- a 1))))) (pow 4 3)") should equal(NumericValue(64.0))
     }
+
+    it("Factorial function with accumulator") {
+      exec("(defn fact [x] (let {f (fn [acc x] (if (eq x 1) then acc else (f (* acc x) (- x 1))))} (f 1 x))) (fact 5)") should
+        equal(NumericValue(120))
+    }
+
+
+    it("Range function") {
+      exec("(defn range [l u] (if (gt l u) then [] else (lazy-seq (cons l (range (+ l 1) u))))) (take 2 (range 1 100))") should
+        equal(VectorValue(List(NumericValue(1), NumericValue(2))))
+    }
   }
 
 }
