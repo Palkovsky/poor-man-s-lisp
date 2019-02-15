@@ -58,7 +58,7 @@ Minimalistic LISP dialect implemented in Scala.
       (filter f coll)
       ```
     * ```clojure
-      (reduce f base coll)
+      (reduce f start coll)
       ```
 * #### lambdas 
     * ```clojure
@@ -111,6 +111,7 @@ Minimalistic LISP dialect implemented in Scala.
 ## What it does not have
 * negative numbers parsing, to make one: `(- 0 num)` 
 * maps manipulation functions
+* IO
 * some kind of better conditions handling, like `cond` from Clojure
 * macros definitions
 * and lots of other stuff, too
